@@ -29,5 +29,5 @@ func listen() {
 }
 
 func hello(req *restful.Request, resp *restful.Response) {
-	resp.Write([]byte("world"))
+	resp.Write([]byte("wat\n"))
 }
