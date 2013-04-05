@@ -1,0 +1,3 @@
+[submodule "static/swagger-ui"]
+	path = static/swagger-ui
+	url = git@github.com:ku-ovdp/swagger-ui.git
