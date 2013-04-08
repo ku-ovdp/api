@@ -1,9 +1,24 @@
 package main
 
 import (
+	"fmt"
 	"github.com/emicklei/go-restful"
+	"github.com/ku-ovdp/api/dummy"
+	"github.com/ku-ovdp/api/projects"
+	"github.com/ku-ovdp/api/repository"
 	"net/http"
 )
+
+// Create application services and dependancies
+func constructApplication() {
+	repositories := repository.NewRepositoryGroup()
+	projectRepository := dummy.NewProjectRepository()
+	repositories["projects"] = projectRepository
+
+	apiRoot := fmt.Sprintf("/v%d", API_VERSION)
+	restful.Add(projects.NewProjectService(apiRoot, projectRepository))
+	restful.Add(indexHandler(apiRoot))
+}
 
 // Redirects / requests to the url provided
 func indexHandler(apiRoot string) *restful.WebService {

@@ -3,12 +3,7 @@ package main
 
 import (
 	"flag"
-	"fmt"
-	"github.com/emicklei/go-restful"
 	"github.com/inhies/go-utils/log"
-	"github.com/ku-ovdp/api/dummy"
-	"github.com/ku-ovdp/api/projects"
-	"github.com/ku-ovdp/api/repository"
 	_ "log"
 	"net/http"
 	"os"
@@ -27,17 +22,7 @@ func main() {
 	flag.Parse()
 	setupLogger()
 
-	repositories := repository.NewRepositoryGroup()
-	projectRepository := dummy.NewProjectRepository()
-
-	repositories["projects"] = projectRepository
-	fmt.Printf("%#v\n", repositories)
-
-	apiRoot := fmt.Sprintf("/v%d", API_VERSION)
-	restful.Add(projects.NewProjectService(apiRoot, projectRepository))
-	restful.Add(indexHandler(apiRoot))
-	//restful.Add(NewSessionService())
-	//restful.Add(NewVoiceSampleService())
+	constructApplication()
 
 	listen()
 }
