@@ -4,7 +4,6 @@ import (
 	"flag"
 	"fmt"
 	"github.com/emicklei/go-restful"
-	_ "github.com/ku-ovdp/api/projects"
 	"log"
 	"path/filepath"
 )
