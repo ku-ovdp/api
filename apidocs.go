@@ -1,0 +1,29 @@
+package main
+
+import (
+	"flag"
+	"fmt"
+	"github.com/emicklei/go-restful"
+	_ "github.com/ku-ovdp/api/projects"
+	"log"
+	"path/filepath"
+)
+
+var baseUrl = flag.String("baseURL", "http://api.openvoicedata.org", "Base URL")
+
+func installSwagger() {
+	swaggerUiPath, err := filepath.Abs("static/swagger-ui/dist/")
+	if err != nil {
+		log.Fatalln(err)
+	}
+	config := restful.SwaggerConfig{
+		WebServicesUrl:  *baseUrl,
+		ApiPath:         fmt.Sprintf("/v%d-docs", API_VERSION),
+		SwaggerPath:     "/docs/",
+		SwaggerFilePath: swaggerUiPath}
+	restful.InstallSwaggerService(config)
+}
+
+func init() {
+	installSwagger()
+}
