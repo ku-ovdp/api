@@ -11,6 +11,7 @@ import (
 var baseUrl = flag.String("baseURL", "http://api.openvoicedata.org", "Base URL")
 
 func installSwagger() {
+	flag.Parse()
 	swaggerUiPath, err := filepath.Abs("static/swagger-ui/dist/")
 	if err != nil {
 		log.Fatalln(err)
