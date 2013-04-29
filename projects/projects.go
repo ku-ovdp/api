@@ -16,20 +16,23 @@ type projectService struct {
 func NewProjectService(apiRoot string, repository entities.ProjectRepository) *projectService {
 	ps := new(projectService)
 	ws := new(restful.WebService)
-	ws.
-		Path(apiRoot + "/projects").
+
+	ws.Path(apiRoot + "/projects").
 		Consumes(restful.MIME_JSON).
 		Produces(restful.MIME_JSON)
 
 	ws.Route(ws.GET("").To(ps.listProjects).
-		Doc("List projects"))
+		Doc("List projects").
+		Writes([]entities.Project{}))
 
 	ws.Route(ws.GET("/{project-id}").To(ps.findProject).
 		Doc("Get a project").
-		Param(ws.PathParameter("project-id", "identifier of the project")))
+		Param(ws.PathParameter("project-id", "identifier of the project")).
+		Writes(entities.Project{}))
 
 	ws.Route(ws.POST("").To(ps.createProject).
-		Doc("Create a project"))
+		Doc("Create a project").
+		Reads(entities.Project{}))
 
 	ws.Route(ws.PUT("/{project-id}").To(ps.updateProject).
 		Doc("Update a project").
