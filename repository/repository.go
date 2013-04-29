@@ -11,4 +11,5 @@ type Repository interface {
 	Get(id int) interface{}
 	Put(entity interface{})
 	Remove(id int) error
+	Scan(from, to int) []interface{}
 }
