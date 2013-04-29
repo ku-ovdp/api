@@ -11,6 +11,8 @@ func NewProjectRepository() projectRepository {
 	return map[int]entities.Project{
 		1: {1, "Project Parkinson's"},
 		2: {2, "Disphonia Foo"},
+		3: {3, "Disphonia Bar"},
+		4: {4, "Disphonia Baz"},
 	}
 }
 
@@ -25,4 +27,18 @@ func (pr projectRepository) Put(project entities.Project) {
 func (pr projectRepository) Remove(id int) error {
 	delete(pr, id)
 	return nil
+}
+
+func (pr projectRepository) Scan(from, to int) []entities.Project {
+	results := make([]entities.Project, 0)
+	for id, value := range pr {
+		if id < from {
+			continue
+		}
+		if id > to && to != 0 {
+			continue
+		}
+		results = append(results, value)
+	}
+	return results
 }

@@ -48,11 +48,7 @@ func NewProjectService(apiRoot string, repository entities.ProjectRepository) *p
 }
 
 func (ps *projectService) listProjects(request *restful.Request, response *restful.Response) {
-	// @todo hardcoded, expose listing api in repository
-	response.WriteAsJson([]entities.Project{
-		entities.Project{1, "Project Parkinson's"},
-		entities.Project{2, "Disphonia Foo"},
-	})
+	response.WriteAsJson(ps.repository.Scan(0, 0))
 }
 
 func (ps *projectService) findProject(request *restful.Request, response *restful.Response) {
