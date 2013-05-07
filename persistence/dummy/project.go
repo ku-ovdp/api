@@ -26,6 +26,7 @@ var dummyData = map[int]entities.Project{
 			{Label: "Age", Slug: "age", Type: "int", Required: true, Description: "Your Age"},
 			{Label: "Gender", Slug: "gender", Type: "string", Required: true, Description: "Your Gender",
 				Meta: `{"options": ["Male", "Female", "Undisclosed"]}`},
+			{Label: "Parkinson's Diagnosis", Slug: "parkinsons", Type: "bool", Required: true, Description: "Have you been diagnosed with Parkinson's?"},
 		},
 		Created: time.Now().Add(time.Hour * -24 * 14)},
 
