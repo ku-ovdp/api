@@ -10,22 +10,27 @@ type projectRepository map[int]entities.Project
 
 var dummyData = map[int]entities.Project{
 	1: {Id: 1, Name: "Project Parkinson's",
-		Slug: "parkinsons",
-		HighlevelDescription: "Project Parkinson's ... (high level)",
-		DetailedDescription: "Project Parkinson's ... (detailed)",
-		PrivacyPolicyURL: "http://openvoicedata.org/privacy.php",
+		Slug:                   "parkinsons",
+		HighlevelDescription:   "Project Parkinson's ... (high level)",
+		DetailedDescription:    "Project Parkinson's ... (detailed)",
+		PrivacyPolicyURL:       "http://openvoicedata.org/privacy.php",
 		MinimumNumberOfSamples: 2,
 		MaximumNumberOfSamples: 3,
-		GeneralInstructions: "(general instructions)",
+		GeneralInstructions:    "(general instructions)",
 		SampleInstructions: []entities.SampleInstruction{
 			{Duration: 10, Instruction: "Produce an 'Ah' sound at a comfortable level."},
 			{Duration: 10, Instruction: "Produce an 'Ah' sound with twice the previous effort."},
 			{Duration: 0, Instruction: "Produce normal conversational speaking"},
 		},
+		FormFields: []entities.FormField{
+			{Label: "Age", Slug: "age", Type: "int", Required: true, Description: "Your Age"},
+			{Label: "Gender", Slug: "gender", Type: "string", Required: true, Description: "Your Gender",
+				Meta: `{"options": ["Male", "Female", "Undisclosed"]}`},
+		},
 		Created: time.Now().Add(time.Hour * -24 * 14)},
 
 	2: {Id: 2, Name: "Disphonia Foobar",
-		Slug: "foobar",
+		Slug:    "foobar",
 		Created: time.Now().Add(time.Hour * -24 * 10)},
 }
 
