@@ -2,8 +2,8 @@
 package projects
 
 import (
-	"github.com/traviscline/go-restful"
 	"github.com/ku-ovdp/api/entities"
+	"github.com/traviscline/go-restful"
 	"net/http"
 	"strconv"
 )

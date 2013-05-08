@@ -2,11 +2,11 @@
 package sessions
 
 import (
-	"github.com/traviscline/go-restful"
+	"fmt"
 	"github.com/ku-ovdp/api/entities"
+	"github.com/traviscline/go-restful"
 	"net/http"
 	"strconv"
-	"fmt"
 )
 
 type sessionService struct {

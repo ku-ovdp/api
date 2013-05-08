@@ -25,12 +25,12 @@ var dummySessionData = map[int]Session{
 		},
 		Samples: []VoiceSample{
 			{Created: time.Now().Add(time.Hour * -14),
-			Length: time.Second * 10,
-			Bitrate: 24000,
-			AudioURL: "http://s3.amazon.com/dopebeats.pcm",
+				Length:   time.Second * 10,
+				Bitrate:  24000,
+				AudioURL: "http://s3.amazon.com/dopebeats.pcm",
 			},
 		},
-		},
+	},
 }
 
 func NewSessionRepository(repositories repository.RepositoryGroup) sessionRepository {
