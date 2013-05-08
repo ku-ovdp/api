@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/emicklei/go-restful"
+	"github.com/traviscline/go-restful"
 	"github.com/ku-ovdp/api/persistence/dummy"
 	"github.com/ku-ovdp/api/projects"
 	"github.com/ku-ovdp/api/repository"

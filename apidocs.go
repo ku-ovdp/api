@@ -3,7 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/emicklei/go-restful"
+	"github.com/traviscline/go-restful"
 	"log"
 	"path/filepath"
 )

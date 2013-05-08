@@ -2,7 +2,7 @@
 package projects
 
 import (
-	"github.com/emicklei/go-restful"
+	"github.com/traviscline/go-restful"
 	"github.com/ku-ovdp/api/entities"
 	"net/http"
 	"strconv"
