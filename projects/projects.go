@@ -48,7 +48,11 @@ func NewProjectService(apiRoot string, repository entities.ProjectRepository) *p
 }
 
 func (ps *projectService) listProjects(request *restful.Request, response *restful.Response) {
-	response.WriteAsJson(ps.repository.Scan(0, 0))
+	if projects, err := ps.repository.Scan(0, 0); err == nil {
+		response.WriteEntity(projects)
+	} else {
+		response.WriteError(http.StatusBadRequest, err)
+	}
 }
 
 func (ps *projectService) findProject(request *restful.Request, response *restful.Response) {
@@ -57,8 +61,7 @@ func (ps *projectService) findProject(request *restful.Request, response *restfu
 		response.WriteError(http.StatusBadRequest, err)
 		return
 	}
-
-	project := ps.repository.Get(id)
+	project, err := ps.repository.Get(id)
 
 	if project.Id == 0 {
 		response.WriteError(http.StatusNotFound, nil)

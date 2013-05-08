@@ -5,10 +5,10 @@ import (
 )
 
 type ProjectRepository interface {
-	Get(id int) Project
-	Put(project Project)
+	Get(id int) (Project, error)
+	Put(project Project) error
 	Remove(id int) error
-	Scan(from, to int) []Project
+	Scan(from, to int) ([]Project, error)
 }
 
 type SampleInstruction struct {

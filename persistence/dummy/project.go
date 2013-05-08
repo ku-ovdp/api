@@ -2,13 +2,14 @@
 package dummy
 
 import (
-	"github.com/ku-ovdp/api/entities"
+	. "github.com/ku-ovdp/api/entities"
+	"github.com/ku-ovdp/api/repository"
 	"time"
 )
 
-type projectRepository map[int]entities.Project
+type projectRepository map[int]Project
 
-var dummyData = map[int]entities.Project{
+var dummyProjectData = map[int]Project{
 	1: {Id: 1, Name: "Project Parkinson's",
 		Slug:                   "parkinsons",
 		HighlevelDescription:   "Project Parkinson's ... (high level)",
@@ -17,12 +18,12 @@ var dummyData = map[int]entities.Project{
 		MinimumNumberOfSamples: 2,
 		MaximumNumberOfSamples: 3,
 		GeneralInstructions:    "(general instructions)",
-		SampleInstructions: []entities.SampleInstruction{
+		SampleInstructions: []SampleInstruction{
 			{Duration: 10, Instruction: "Produce an 'Ah' sound at a comfortable level."},
 			{Duration: 10, Instruction: "Produce an 'Ah' sound with twice the previous effort."},
 			{Duration: 0, Instruction: "Produce normal conversational speaking"},
 		},
-		FormFields: []entities.FormField{
+		FormFields: []FormField{
 			{Label: "Age", Slug: "age", Type: "int", Required: true, Description: "Your Age"},
 			{Label: "Gender", Slug: "gender", Type: "string", Required: true, Description: "Your Gender",
 				Meta: `{"options": ["Male", "Female", "Undisclosed"]}`},
@@ -35,16 +36,21 @@ var dummyData = map[int]entities.Project{
 		Created: time.Now().Add(time.Hour * -24 * 10)},
 }
 
-func NewProjectRepository() projectRepository {
-	return dummyData
+func NewProjectRepository(repositories repository.RepositoryGroup) projectRepository {
+	return dummyProjectData
 }
 
-func (pr projectRepository) Get(id int) entities.Project {
-	return pr[id]
+func (pr projectRepository) Get(id int) (Project, error) {
+	if p, ok := pr[id]; ok {
+		return p, nil
+	} else {
+		return Project{}, NotFound
+	}
 }
 
-func (pr projectRepository) Put(project entities.Project) {
+func (pr projectRepository) Put(project Project) error {
 	pr[project.Id] = project
+	return nil
 }
 
 func (pr projectRepository) Remove(id int) error {
@@ -52,8 +58,8 @@ func (pr projectRepository) Remove(id int) error {
 	return nil
 }
 
-func (pr projectRepository) Scan(from, to int) []entities.Project {
-	results := make([]entities.Project, 0)
+func (pr projectRepository) Scan(from, to int) ([]Project, error) {
+	results := []Project{}
 	for id, value := range pr {
 		if id < from {
 			continue
@@ -63,5 +69,5 @@ func (pr projectRepository) Scan(from, to int) []entities.Project {
 		}
 		results = append(results, value)
 	}
-	return results
+	return results, nil
 }
