@@ -33,5 +33,6 @@ type VoiceSample struct {
 }
 
 type FormFieldValue struct {
-	Value Stringer
+	FieldSlug string
+	Value interface{}
 }

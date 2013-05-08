@@ -17,7 +17,20 @@ type sessionRepository struct {
 
 var dummySessionData = map[int]Session{
 	1: {Id: 1, ProjectId: 1,
-		Created: time.Now().Add(time.Hour * -24 * 14)},
+		Created: time.Now().Add(time.Hour * -24 * 14),
+		FormValues: []FormFieldValue{
+			{FieldSlug: "age", Value: 42},
+			{FieldSlug: "gender", Value: "Male"},
+			{FieldSlug: "parkinsons", Value: true},
+		},
+		Samples: []VoiceSample{
+			{Created: time.Now().Add(time.Hour * -14),
+			Length: time.Second * 10,
+			Bitrate: 24000,
+			AudioURL: "http://s3.amazon.com/dopebeats.pcm",
+			},
+		},
+		},
 }
 
 func NewSessionRepository(repositories repository.RepositoryGroup) sessionRepository {
