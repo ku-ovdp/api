@@ -2,7 +2,6 @@
 package sessions
 
 import (
-	"fmt"
 	"github.com/ku-ovdp/api/entities"
 	"github.com/traviscline/go-restful"
 	"net/http"
