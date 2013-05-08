@@ -1,12 +1,13 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
-	"github.com/traviscline/go-restful"
 	"github.com/ku-ovdp/api/persistence/dummy"
 	"github.com/ku-ovdp/api/projects"
 	"github.com/ku-ovdp/api/repository"
 	"github.com/ku-ovdp/api/sessions"
+	"github.com/traviscline/go-restful"
 	"net/http"
 	"time"
 )
@@ -34,28 +35,21 @@ func constructApplication() {
 	restful.DefaultResponseMimeType = restful.MIME_JSON
 	restful.Add(projects.NewProjectService(apiRoot, projectRepository))
 	restful.Add(sessions.NewSessionService(apiRoot, sessionRepository))
-	restful.Add(indexHandler(apiRoot))
+
+	http.HandleFunc("/", indexHandler(apiRoot))
+	http.Handle("/favicon.ico", http.NotFoundHandler())
 }
 
-// Redirects / requests to the url provided
-func indexHandler(apiRoot string) *restful.WebService {
-	ws := new(restful.WebService)
-	ws.Produces(restful.MIME_JSON).Consumes(restful.MIME_JSON)
-	ws.Route(ws.GET("/").To(func(req *restful.Request, resp *restful.Response) {
-		http.Redirect(resp.ResponseWriter, req.Request, apiRoot, http.StatusFound)
-	}))
-	ws.Route(ws.GET(apiRoot).To(func(req *restful.Request, resp *restful.Response) {
-		apiListing := []struct {
+func indexHandler(apiRoot string) func(http.ResponseWriter, *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		b, _ := json.MarshalIndent([]struct {
 			Url string `json:"endpoint_url"`
 		}{
 			{apiRoot + "/projects"},
-		}
-		resp.WriteAsJson(apiListing)
-	}))
-	ws.Route(ws.GET("/favicon.ico").To(func(req *restful.Request, resp *restful.Response) {
-		resp.WriteHeader(http.StatusNotFound)
-	}))
-	return ws
+		}, "", "  ")
+		fmt.Fprintln(w, string(b))
+	}
 }
 
 type loggedResponseWriter struct {
