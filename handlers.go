@@ -31,6 +31,7 @@ func constructApplication() {
 		t1 := time.Now()
 		restful.DefaultDispatch(lwr, r)
 		fmt.Println(r.Method, r.URL, lwr.status, time.Now().Sub(t1))
+		fmt.Println(r.Header)
 	}
 	restful.DefaultResponseMimeType = restful.MIME_JSON
 	restful.Add(projects.NewProjectService(apiRoot, projectRepository))
