@@ -9,8 +9,8 @@ type Stringer interface {
 }
 
 type SessionRepository interface {
-	Get(id int) Session
-	Put(project Session)
+	Get(id int) (Session, error)
+	Put(session Session) (Session, error)
 	Remove(id int) error
 	Scan(projectId int, from, to int) ([]Session, error)
 }

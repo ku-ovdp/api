@@ -37,12 +37,18 @@ func NewSessionRepository(repositories repository.RepositoryGroup) sessionReposi
 	return sessionRepository{dummySessionData, repositories["projects"].(ProjectRepository)}
 }
 
-func (sr sessionRepository) Get(id int) Session {
-	return sr.sessionRepo[id]
+func (sr sessionRepository) Get(id int) (Session, error) {
+	if obj, ok := sr.sessionRepo[id]; ok {
+		return obj, nil
+	} else {
+		return Session{}, NotFound
+	}
 }
 
-func (sr sessionRepository) Put(session Session) {
+func (sr sessionRepository) Put(session Session) (Session, error) {
+	session.Id = len(sr.sessionRepo) + 1
 	sr.sessionRepo[session.Id] = session
+	return session, nil
 }
 
 func (sr sessionRepository) Remove(id int) error {

@@ -48,9 +48,9 @@ func (pr projectRepository) Get(id int) (Project, error) {
 	}
 }
 
-func (pr projectRepository) Put(project Project) error {
+func (pr projectRepository) Put(project Project) (Project, error) {
 	pr[project.Id] = project
-	return nil
+	return project, nil
 }
 
 func (pr projectRepository) Remove(id int) error {
