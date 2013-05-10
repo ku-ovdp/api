@@ -57,9 +57,8 @@ func (sr sessionRepository) Remove(id int) error {
 }
 
 func (sr sessionRepository) Scan(projectId int, from, to int) ([]Session, error) {
-	_, err := sr.projects.Get(projectId)
 	results := []Session{}
-	if err != nil {
+	if _, err := sr.projects.Get(projectId); err != nil {
 		if err == NotFound {
 			err = fmt.Errorf("Project with id %d not found.", projectId)
 		}
