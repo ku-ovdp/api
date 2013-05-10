@@ -7,6 +7,8 @@ import (
 
 type dummyBackend struct{}
 
+func (d dummyBackend) Init(args ...interface{}) {}
+
 func init() {
 	persistence.Register("dummy", dummyBackend{})
 }

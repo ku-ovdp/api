@@ -8,6 +8,7 @@ import (
 type Backend interface {
 	NewProjectRepository(RepositoryGroup) ProjectRepository
 	NewSessionRepository(RepositoryGroup) SessionRepository
+	Init(args ...interface{})
 }
 
 func Get(identifier string) Backend {

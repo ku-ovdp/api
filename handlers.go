@@ -19,7 +19,6 @@ import (
 // Create application services and dependancies
 func constructApplication() {
 
-	repositories := repository.NewRepositoryGroup()
 	sg := sockgroup.NewGroup()
 	sg.Start()
 	stats.Destination = sg
@@ -30,7 +29,9 @@ func constructApplication() {
 	if backend == nil {
 		logger.Fatalln("Invalid repository backend.", *persistenceBackend)
 	}
+	backend.Init()
 
+	repositories := repository.NewRepositoryGroup()
 	projectRepository := backend.NewProjectRepository(repositories)
 	repositories["projects"] = projectRepository
 	sessionRepository := backend.NewSessionRepository(repositories)
