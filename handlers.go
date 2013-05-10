@@ -7,6 +7,7 @@ import (
 	"github.com/ku-ovdp/api/projects"
 	"github.com/ku-ovdp/api/repository"
 	"github.com/ku-ovdp/api/sessions"
+	"github.com/ku-ovdp/api/stats"
 	"github.com/traviscline/go-restful"
 	"net/http"
 	"time"
@@ -61,6 +62,7 @@ type loggedResponseWriter struct {
 func (w *loggedResponseWriter) WriteHeader(status int) {
 	w.status = status
 	w.ResponseWriter.WriteHeader(status)
+	stats.ChangeStat("requests", 1)
 }
 
 func (w *loggedResponseWriter) Write(b []byte) (int, error) {

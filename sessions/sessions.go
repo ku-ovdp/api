@@ -3,6 +3,7 @@ package sessions
 
 import (
 	"github.com/ku-ovdp/api/entities"
+	"github.com/ku-ovdp/api/stats"
 	"github.com/traviscline/go-restful"
 	"net/http"
 	"strconv"
@@ -112,6 +113,7 @@ func (s *sessionService) createSession(request *restful.Request, response *restf
 		return
 	}
 
+	stats.ChangeStat("sessions", 1)
 	response.WriteHeader(http.StatusCreated)
 	response.WriteEntity(session)
 }
