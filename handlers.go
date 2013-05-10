@@ -8,7 +8,7 @@ import (
 	"github.com/ku-ovdp/api/repository"
 	"github.com/ku-ovdp/api/sessions"
 	"github.com/ku-ovdp/api/stats"
-	"github.com/ku-ovdp/api/wsgroup"
+	"github.com/ku-ovdp/api/sockgroup"
 	"github.com/traviscline/go-restful"
 	"net/http"
 	"time"
@@ -17,9 +17,9 @@ import (
 // Create application services and dependancies
 func constructApplication() {
 	repositories := repository.NewRepositoryGroup()
-	wsg := wsgroup.NewGroup()
-	wsg.Start()
-	stats.Destination = wsg
+	sg := sockgroup.NewGroup()
+	sg.Start()
+	stats.Destination = sg
 
 	// construct repositories
 	projectRepository := dummy.NewProjectRepository(repositories)
@@ -39,7 +39,7 @@ func constructApplication() {
 	restful.Add(projects.NewProjectService(apiRoot, projectRepository))
 	restful.Add(sessions.NewSessionService(apiRoot, sessionRepository))
 
-	http.Handle("/statistics", wsg.Handler())
+	http.Handle("/stats/", sg.Handler("/stats"))
 	http.Handle("/favicon.ico", http.NotFoundHandler())
 	http.HandleFunc("/", indexHandler(apiRoot))
 }
