@@ -3,12 +3,14 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/ku-ovdp/api/persistence/dummy"
+	_ "github.com/ku-ovdp/api/persistence/dummy"
+	//_ "github.com/ku-ovdp/api/persistence/mgo"
+	"github.com/ku-ovdp/api/persistence"
 	"github.com/ku-ovdp/api/projects"
 	"github.com/ku-ovdp/api/repository"
 	"github.com/ku-ovdp/api/sessions"
-	"github.com/ku-ovdp/api/stats"
 	"github.com/ku-ovdp/api/sockgroup"
+	"github.com/ku-ovdp/api/stats"
 	"github.com/traviscline/go-restful"
 	"net/http"
 	"time"
@@ -16,15 +18,22 @@ import (
 
 // Create application services and dependancies
 func constructApplication() {
+
 	repositories := repository.NewRepositoryGroup()
 	sg := sockgroup.NewGroup()
 	sg.Start()
 	stats.Destination = sg
 
 	// construct repositories
-	projectRepository := dummy.NewProjectRepository(repositories)
+
+	backend := persistence.Get(*persistenceBackend)
+	if backend == nil {
+		logger.Fatalln("Invalid repository backend.", *persistenceBackend)
+	}
+
+	projectRepository := backend.NewProjectRepository(repositories)
 	repositories["projects"] = projectRepository
-	sessionRepository := dummy.NewSessionRepository(repositories)
+	sessionRepository := backend.NewSessionRepository(repositories)
 	repositories["sessions"] = sessionRepository
 
 	restful.Dispatch = func(w http.ResponseWriter, r *http.Request) {

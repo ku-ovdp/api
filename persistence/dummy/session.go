@@ -4,9 +4,13 @@ package dummy
 import (
 	"fmt"
 	. "github.com/ku-ovdp/api/entities"
-	"github.com/ku-ovdp/api/repository"
+	. "github.com/ku-ovdp/api/repository"
 	"time"
 )
+
+func (d dummyBackend) NewSessionRepository(repositories RepositoryGroup) SessionRepository {
+	return sessionRepository{dummySessionData, repositories["projects"].(ProjectRepository)}
+}
 
 type sessionRepo map[int]Session
 
@@ -31,10 +35,6 @@ var dummySessionData = map[int]Session{
 			},
 		},
 	},
-}
-
-func NewSessionRepository(repositories repository.RepositoryGroup) sessionRepository {
-	return sessionRepository{dummySessionData, repositories["projects"].(ProjectRepository)}
 }
 
 func (sr sessionRepository) Get(id int) (Session, error) {

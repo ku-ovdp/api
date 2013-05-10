@@ -3,13 +3,17 @@ package dummy
 
 import (
 	. "github.com/ku-ovdp/api/entities"
-	"github.com/ku-ovdp/api/repository"
+	. "github.com/ku-ovdp/api/repository"
 	"time"
 )
 
+func (d dummyBackend) NewProjectRepository(repositories RepositoryGroup) ProjectRepository {
+	return dummyProjectData
+}
+
 type projectRepository map[int]Project
 
-var dummyProjectData = map[int]Project{
+var dummyProjectData = projectRepository{
 	1: {Id: 1, Name: "Project Parkinson's",
 		Slug:                   "parkinsons",
 		HighlevelDescription:   "Project Parkinson's ... (high level)",
@@ -34,10 +38,6 @@ var dummyProjectData = map[int]Project{
 	2: {Id: 2, Name: "Disphonia Foobar",
 		Slug:    "foobar",
 		Created: time.Now().Add(time.Hour * -24 * 10)},
-}
-
-func NewProjectRepository(repositories repository.RepositoryGroup) projectRepository {
-	return dummyProjectData
 }
 
 func (pr projectRepository) Get(id int) (Project, error) {
