@@ -1,7 +1,6 @@
 package stats
 
 import (
-	"log"
 	"sync"
 )
 
@@ -19,7 +18,6 @@ var stats struct {
 }
 
 func ChangeStat(statName string, change int) {
-	log.Println("ChangeStat", statName, change, stats.data[statName])
 	stats.Lock()
 	defer stats.Unlock()
 	stats.data[statName] = stats.data[statName] + change
