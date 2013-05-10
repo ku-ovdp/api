@@ -3,9 +3,9 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	_ "github.com/ku-ovdp/api/persistence/dummy"
-	//_ "github.com/ku-ovdp/api/persistence/mgo"
 	"github.com/ku-ovdp/api/persistence"
+	_ "github.com/ku-ovdp/api/persistence/dummy"
+	_ "github.com/ku-ovdp/api/persistence/mgo"
 	"github.com/ku-ovdp/api/projects"
 	"github.com/ku-ovdp/api/repository"
 	"github.com/ku-ovdp/api/sessions"

@@ -17,7 +17,7 @@ var logger *log.Logger
 
 // Flags
 var logLevel = flag.String("logLevel", "info", "Log level (warn, info, debug)")
-var persistenceBackend = flag.String("persistenceBackend", "dummy", "Persistence backend (dummy, mgo)")
+var persistenceBackend = flag.String("persistenceBackend", "mgo", "Persistence backend (dummy, mgo)")
 
 func main() {
 	flag.Parse()
