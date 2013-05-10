@@ -35,10 +35,17 @@ func (sg *sockgroup) Start() {
 				delete(sg.members, member)
 			case message := <-sg.messages:
 				for member, _ := range sg.members {
-					_, err := member.WriteMessage(message)
-					if err != nil {
-						sg.unregister <- member
-					}
+					go func(member sockjs.Conn) {
+						defer func() {
+							if r := recover(); r != nil {
+								sg.unregister <- member
+							}
+						}()
+						_, err := member.WriteMessage(message)
+						if err != nil {
+							sg.unregister <- member
+						}
+					}(member)
 				}
 			}
 		}
