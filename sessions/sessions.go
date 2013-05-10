@@ -27,6 +27,8 @@ func NewSessionService(apiRoot string, repository SessionRepository) *sessionSer
 	ws.Route(ws.GET("").To(s.listSessions).
 		Doc("List sessions").
 		Param(ws.PathParameter("project-id", "identifier of the project").DataType("int")).
+		Param(ws.QueryParameter("from", "minimum identifier of a project")).
+		Param(ws.QueryParameter("to", "maximum identifier of a project")).
 		Writes([]Session{}))
 
 	ws.Route(ws.GET("/{session-id}").To(s.findSession).
@@ -68,8 +70,10 @@ func (s *sessionService) listSessions(request *restful.Request, response *restfu
 		response.WriteError(http.StatusBadRequest, err)
 		return
 	}
+	from, _ := strconv.Atoi(request.QueryParameter("from"))
+	to, _ := strconv.Atoi(request.QueryParameter("to"))
 
-	if sessions, err := s.repository.Scan(projectId, 0, 0); err == nil {
+	if sessions, err := s.repository.Scan(projectId, from, to); err == nil {
 		response.WriteEntity(sessions)
 	} else {
 		response.WriteError(http.StatusBadRequest, err)

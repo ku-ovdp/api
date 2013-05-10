@@ -24,6 +24,8 @@ func NewProjectService(apiRoot string, repository ProjectRepository) *projectSer
 
 	ws.Route(ws.GET("").To(ps.listProjects).
 		Doc("List projects").
+		Param(ws.QueryParameter("from", "minimum identifier of a project")).
+		Param(ws.QueryParameter("to", "maximum identifier of a project")).
 		Writes([]Project{}))
 
 	ws.Route(ws.GET("/{project-id}").To(ps.findProject).
@@ -49,7 +51,10 @@ func NewProjectService(apiRoot string, repository ProjectRepository) *projectSer
 }
 
 func (ps *projectService) listProjects(request *restful.Request, response *restful.Response) {
-	if projects, err := ps.repository.Scan(0, 0); err == nil {
+	from, _ := strconv.Atoi(request.QueryParameter("from"))
+	to, _ := strconv.Atoi(request.QueryParameter("to"))
+
+	if projects, err := ps.repository.Scan(from, to); err == nil {
 		response.WriteEntity(projects)
 	} else {
 		response.WriteError(http.StatusBadRequest, err)
@@ -107,5 +112,10 @@ func (ps *projectService) removeProject(request *restful.Request, response *rest
 		return
 	}
 
-	ps.repository.Remove(id)
+	err = ps.repository.Remove(id)
+	if err == nil {
+		response.WriteEntity("removed")
+	} else {
+		response.WriteError(http.StatusBadRequest, err)
+	}
 }
