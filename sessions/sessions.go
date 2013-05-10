@@ -54,6 +54,11 @@ func NewSessionService(apiRoot string, repository SessionRepository) *sessionSer
 
 	s.WebService = ws
 	s.repository = repository
+
+	// set initial stats
+	sessions, _ := repository.Scan(1, 0, 0)
+	stats.ChangeStat("sessions", len(sessions))
+
 	return s
 }
 
