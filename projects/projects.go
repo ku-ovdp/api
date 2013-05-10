@@ -2,7 +2,8 @@
 package projects
 
 import (
-	"github.com/ku-ovdp/api/entities"
+	. "github.com/ku-ovdp/api/entities"
+	. "github.com/ku-ovdp/api/repository"
 	"github.com/traviscline/go-restful"
 	"net/http"
 	"strconv"
@@ -10,10 +11,10 @@ import (
 
 type projectService struct {
 	*restful.WebService
-	repository entities.ProjectRepository
+	repository ProjectRepository
 }
 
-func NewProjectService(apiRoot string, repository entities.ProjectRepository) *projectService {
+func NewProjectService(apiRoot string, repository ProjectRepository) *projectService {
 	ps := new(projectService)
 	ws := new(restful.WebService)
 
@@ -23,16 +24,16 @@ func NewProjectService(apiRoot string, repository entities.ProjectRepository) *p
 
 	ws.Route(ws.GET("").To(ps.listProjects).
 		Doc("List projects").
-		Writes([]entities.Project{}))
+		Writes([]Project{}))
 
 	ws.Route(ws.GET("/{project-id}").To(ps.findProject).
 		Doc("Get a project").
 		Param(ws.PathParameter("project-id", "identifier of the project")).
-		Writes(entities.Project{}))
+		Writes(Project{}))
 
 	ws.Route(ws.POST("").To(ps.createProject).
 		Doc("Create a project").
-		Reads(entities.Project{}))
+		Reads(Project{}))
 
 	ws.Route(ws.PUT("/{project-id}").To(ps.updateProject).
 		Doc("Update a project").
@@ -71,7 +72,7 @@ func (ps *projectService) findProject(request *restful.Request, response *restfu
 }
 
 func (ps *projectService) updateProject(request *restful.Request, response *restful.Response) {
-	project := new(entities.Project)
+	project := new(Project)
 	err := request.ReadEntity(&project)
 	if err == nil {
 		ps.repository.Put(*project)
@@ -88,7 +89,7 @@ func (ps *projectService) createProject(request *restful.Request, response *rest
 		return
 	}
 
-	project := entities.Project{Id: id}
+	project := Project{Id: id}
 	err = request.ReadEntity(&project)
 	if err == nil {
 		ps.repository.Put(project)

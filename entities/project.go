@@ -4,13 +4,6 @@ import (
 	"time"
 )
 
-type ProjectRepository interface {
-	Get(id int) (Project, error)
-	Put(project Project) (Project, error)
-	Remove(id int) error
-	Scan(from, to int) ([]Project, error)
-}
-
 type SampleInstruction struct {
 	Duration    int
 	Instruction string

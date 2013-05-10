@@ -2,7 +2,8 @@
 package sessions
 
 import (
-	"github.com/ku-ovdp/api/entities"
+	. "github.com/ku-ovdp/api/entities"
+	. "github.com/ku-ovdp/api/repository"
 	"github.com/ku-ovdp/api/stats"
 	"github.com/traviscline/go-restful"
 	"net/http"
@@ -12,10 +13,10 @@ import (
 
 type sessionService struct {
 	*restful.WebService
-	repository entities.SessionRepository
+	repository SessionRepository
 }
 
-func NewSessionService(apiRoot string, repository entities.SessionRepository) *sessionService {
+func NewSessionService(apiRoot string, repository SessionRepository) *sessionService {
 	s := new(sessionService)
 	ws := new(restful.WebService)
 
@@ -26,18 +27,18 @@ func NewSessionService(apiRoot string, repository entities.SessionRepository) *s
 	ws.Route(ws.GET("").To(s.listSessions).
 		Doc("List sessions").
 		Param(ws.PathParameter("project-id", "identifier of the project").DataType("int")).
-		Writes([]entities.Session{}))
+		Writes([]Session{}))
 
 	ws.Route(ws.GET("/{session-id}").To(s.findSession).
 		Doc("Get a session").
 		Param(ws.PathParameter("project-id", "identifier of the project").DataType("int")).
 		Param(ws.PathParameter("session-id", "identifier of the session").DataType("int")).
-		Writes(entities.Session{}))
+		Writes(Session{}))
 
 	ws.Route(ws.POST("").To(s.createSession).
 		Doc("Create a session").
 		Param(ws.PathParameter("project-id", "identifier of the project").DataType("int")).
-		Reads(entities.Session{}))
+		Reads(Session{}))
 
 	ws.Route(ws.PUT("/{session-id}").To(s.updateSession).
 		Param(ws.PathParameter("project-id", "identifier of the project").DataType("int")).
@@ -86,7 +87,7 @@ func (s *sessionService) findSession(request *restful.Request, response *restful
 }
 
 func (s *sessionService) updateSession(request *restful.Request, response *restful.Response) {
-	session := new(entities.Session)
+	session := new(Session)
 	err := request.ReadEntity(&session)
 	if err == nil {
 		s.repository.Put(*session)
@@ -103,7 +104,7 @@ func (s *sessionService) createSession(request *restful.Request, response *restf
 		return
 	}
 
-	session := entities.Session{
+	session := Session{
 		ProjectId: projectId,
 		Created:   time.Now(),
 	}
