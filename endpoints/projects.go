@@ -4,6 +4,7 @@ package endpoints
 import (
 	. "github.com/ku-ovdp/api/entities"
 	. "github.com/ku-ovdp/api/repository"
+	"github.com/ku-ovdp/api/stats"
 	"github.com/traviscline/go-restful"
 	"net/http"
 	"strconv"
@@ -47,6 +48,11 @@ func NewProjectService(apiRoot string, repository ProjectRepository) *projectSer
 
 	ps.WebService = ws
 	ps.repository = repository
+
+	// set initial stats
+	projects, _ := repository.Scan(0, 0)
+	stats.ChangeStat("projects", len(projects))
+
 	return ps
 }
 
