@@ -33,6 +33,9 @@ func (sr *sessionRepository) Get(id int) (Session, error) {
 	result := Session{}
 	q := sr.c.Find(bson.M{"id": id})
 	err := q.One(&result)
+	if err == mgo.ErrNotFound {
+		return result, NewErrNotFound(Session{}, id)
+	}
 	return result, err
 }
 
@@ -55,9 +58,6 @@ func (sr *sessionRepository) Scan(projectId int, from, to int) ([]Session, error
 	results := []Session{}
 
 	if _, err := sr.projects.Get(projectId); err != nil {
-		if err == NotFound {
-			err = fmt.Errorf("Project with id %d not found.", projectId)
-		}
 		return results, err
 	}
 

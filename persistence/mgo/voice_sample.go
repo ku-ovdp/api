@@ -33,6 +33,9 @@ func (sr *sampleRepository) Get(sessionId, id int) (VoiceSample, error) {
 	result := VoiceSample{}
 	q := sr.c.Find(bson.M{"id": id})
 	err := q.One(&result)
+	if err == mgo.ErrNotFound {
+		return result, NewErrNotFound(Session{}, id)
+	}
 	return result, err
 }
 
@@ -58,9 +61,6 @@ func (sr *sampleRepository) Scan(sessionId int, from, to int) ([]VoiceSample, er
 	results := []VoiceSample{}
 
 	if _, err := sr.sessions.Get(sessionId); err != nil {
-		if err == NotFound {
-			err = fmt.Errorf("VoiceSample with id %d not found.", sessionId)
-		}
 		return results, err
 	}
 

@@ -2,10 +2,18 @@
 package entities
 
 import (
-	"errors"
+	"fmt"
 )
 
-// Common Errors
-var (
-	NotFound = errors.New("Object Not Found")
-)
+type ErrNotFound struct {
+	Entity interface{}
+	Id     int
+}
+
+func NewErrNotFound(entity interface{}, id int) ErrNotFound {
+	return ErrNotFound{entity, id}
+}
+
+func (nf ErrNotFound) Error() string {
+	return fmt.Sprintf("%T id:%d not found", nf.Entity, nf.Id)
+}

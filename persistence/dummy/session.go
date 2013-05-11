@@ -2,7 +2,6 @@
 package dummy
 
 import (
-	"fmt"
 	. "github.com/ku-ovdp/api/entities"
 	. "github.com/ku-ovdp/api/repository"
 	"time"
@@ -39,7 +38,7 @@ func (sr sessionRepository) Get(id int) (Session, error) {
 	if obj, ok := sr.sessionRepo[id]; ok {
 		return obj, nil
 	} else {
-		return Session{}, NotFound
+		return Session{}, NewErrNotFound(Session{}, id)
 	}
 }
 
@@ -57,9 +56,6 @@ func (sr sessionRepository) Remove(id int) error {
 func (sr sessionRepository) Scan(projectId int, from, to int) ([]Session, error) {
 	results := []Session{}
 	if _, err := sr.projects.Get(projectId); err != nil {
-		if err == NotFound {
-			err = fmt.Errorf("Project with id %d not found.", projectId)
-		}
 		return results, err
 	}
 	for id, value := range sr.sessionRepo {

@@ -49,7 +49,7 @@ func (pr projectRepository) Get(id int) (Project, error) {
 	if p, ok := pr.repo[id]; ok {
 		return p, nil
 	} else {
-		return Project{}, NotFound
+		return Project{}, NewErrNotFound(Project{}, id)
 	}
 }
 

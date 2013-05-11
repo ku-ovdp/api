@@ -25,6 +25,9 @@ func (pr projectRepository) Get(id int) (Project, error) {
 	result := Project{}
 	q := pr.c.Find(bson.M{"id": id})
 	err := q.One(&result)
+	if err == mgo.ErrNotFound {
+		return result, NewErrNotFound(Project{}, id)
+	}
 	return result, err
 }
 

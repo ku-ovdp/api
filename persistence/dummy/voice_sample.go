@@ -2,7 +2,6 @@
 package dummy
 
 import (
-	"fmt"
 	. "github.com/ku-ovdp/api/entities"
 	. "github.com/ku-ovdp/api/repository"
 	"time"
@@ -38,12 +37,14 @@ func (sr sampleRepository) Get(sessionId, id int) (VoiceSample, error) {
 	if obj, ok := sr.sampleRepo[id]; ok {
 		return obj, nil
 	} else {
-		return VoiceSample{}, NotFound
+		return VoiceSample{}, NewErrNotFound(VoiceSample{}, id)
 	}
 }
 
 func (sr sampleRepository) Put(sample VoiceSample) (VoiceSample, error) {
-	sample.Id = len(sr.sampleRepo) + 1
+	if sample.Id == 0 {
+		sample.Id = len(sr.sampleRepo) + 1
+	}
 	sr.sampleRepo[sample.Id] = sample
 	return sample, nil
 }
@@ -56,9 +57,6 @@ func (sr sampleRepository) Remove(sessionId, id int) error {
 func (sr sampleRepository) Scan(sessionId int, from, to int) ([]VoiceSample, error) {
 	results := []VoiceSample{}
 	if _, err := sr.sessions.Get(sessionId); err != nil {
-		if err == NotFound {
-			err = fmt.Errorf("Session with id %d not found.", sessionId)
-		}
 		return results, err
 	}
 	for id, value := range sr.sampleRepo {
