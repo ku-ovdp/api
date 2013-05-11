@@ -4,10 +4,6 @@ import (
 	"time"
 )
 
-type Stringer interface {
-	String() string
-}
-
 type Session struct {
 	Id               int
 	ProjectId        int
@@ -16,14 +12,6 @@ type Session struct {
 	Completed        bool
 	UserAgent        string
 	FormValues       []FormFieldValue
-	Samples          []VoiceSample
-}
-
-type VoiceSample struct {
-	Created  time.Time
-	Length   time.Duration
-	Bitrate  int
-	AudioURL string
 }
 
 type FormFieldValue struct {
