@@ -14,6 +14,7 @@ type Session struct {
 	RelatedSessionId int
 	Created          time.Time
 	Completed        bool
+	UserAgent        string
 	FormValues       []FormFieldValue
 	Samples          []VoiceSample
 }

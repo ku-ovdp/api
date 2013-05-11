@@ -114,6 +114,7 @@ func (s *sessionService) createSession(request *restful.Request, response *restf
 	session := Session{
 		ProjectId: projectId,
 		Created:   time.Now(),
+		UserAgent: request.Request.UserAgent(),
 	}
 	session, err = s.repository.Put(session)
 	if err != nil {
