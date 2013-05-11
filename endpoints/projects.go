@@ -1,5 +1,5 @@
-// Package projects supplies an interface to the Project entity
-package projects
+// Package endpoints describes the api endpoints
+package endpoints
 
 import (
 	. "github.com/ku-ovdp/api/entities"

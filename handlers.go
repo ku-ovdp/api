@@ -3,12 +3,11 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/ku-ovdp/api/endpoints"
 	"github.com/ku-ovdp/api/persistence"
 	_ "github.com/ku-ovdp/api/persistence/dummy"
 	_ "github.com/ku-ovdp/api/persistence/mgo"
-	"github.com/ku-ovdp/api/projects"
 	"github.com/ku-ovdp/api/repository"
-	"github.com/ku-ovdp/api/sessions"
 	"github.com/ku-ovdp/api/sockgroup"
 	"github.com/ku-ovdp/api/stats"
 	"github.com/traviscline/go-restful"
@@ -46,8 +45,8 @@ func constructApplication() {
 	restful.DefaultResponseMimeType = restful.MIME_JSON
 
 	apiRoot := fmt.Sprintf("/v%d", API_VERSION)
-	restful.Add(projects.NewProjectService(apiRoot, projectRepository))
-	restful.Add(sessions.NewSessionService(apiRoot, sessionRepository))
+	restful.Add(endpoints.NewProjectService(apiRoot, projectRepository))
+	restful.Add(endpoints.NewSessionService(apiRoot, sessionRepository))
 
 	http.Handle("/stats/", sg.Handler("/stats"))
 	http.Handle("/favicon.ico", http.NotFoundHandler())

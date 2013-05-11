@@ -1,5 +1,4 @@
-// Package sessions supplies an interface to the Session entity
-package sessions
+package endpoints
 
 import (
 	. "github.com/ku-ovdp/api/entities"
