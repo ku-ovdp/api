@@ -8,12 +8,17 @@ import (
 )
 
 func (d dummyBackend) NewProjectRepository(repositories RepositoryGroup) ProjectRepository {
-	return dummyProjectData
+	return projectRepository{dummyProjectData, repositories}
 }
 
-type projectRepository map[int]Project
+type projectRepo map[int]Project
 
-var dummyProjectData = projectRepository{
+type projectRepository struct {
+	repo  projectRepo
+	group RepositoryGroup
+}
+
+var dummyProjectData = projectRepo{
 	1: {Id: 1, Name: "Project Parkinson's",
 		Slug:                   "parkinsons",
 		HighlevelDescription:   "Project Parkinson's ... (high level)",
@@ -41,7 +46,7 @@ var dummyProjectData = projectRepository{
 }
 
 func (pr projectRepository) Get(id int) (Project, error) {
-	if p, ok := pr[id]; ok {
+	if p, ok := pr.repo[id]; ok {
 		return p, nil
 	} else {
 		return Project{}, NotFound
@@ -49,18 +54,18 @@ func (pr projectRepository) Get(id int) (Project, error) {
 }
 
 func (pr projectRepository) Put(project Project) (Project, error) {
-	pr[project.Id] = project
+	pr.repo[project.Id] = project
 	return project, nil
 }
 
 func (pr projectRepository) Remove(id int) error {
-	delete(pr, id)
+	delete(pr.repo, id)
 	return nil
 }
 
 func (pr projectRepository) Scan(from, to int) ([]Project, error) {
 	results := []Project{}
-	for id, value := range pr {
+	for id, value := range pr.repo {
 		if id < from {
 			continue
 		}
@@ -70,4 +75,8 @@ func (pr projectRepository) Scan(from, to int) ([]Project, error) {
 		results = append(results, value)
 	}
 	return results, nil
+}
+
+func (pr projectRepository) Group() RepositoryGroup {
+	return pr.group
 }

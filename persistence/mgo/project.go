@@ -12,12 +12,13 @@ func (m *mgoBackend) NewProjectRepository(repositories RepositoryGroup) ProjectR
 	if m.db == nil {
 		panic("Not initialized! Missing call to Init()?")
 	}
-	return &projectRepository{m, m.db.C("projects")}
+	return &projectRepository{m, m.db.C("projects"), repositories}
 }
 
 type projectRepository struct {
 	backend *mgoBackend
 	c       *mgo.Collection
+	group   RepositoryGroup
 }
 
 func (pr projectRepository) Get(id int) (Project, error) {
@@ -54,4 +55,8 @@ func (pr projectRepository) Scan(from, to int) ([]Project, error) {
 	err := q.All(&results)
 
 	return results, err
+}
+
+func (pr projectRepository) Group() RepositoryGroup {
+	return pr.group
 }
