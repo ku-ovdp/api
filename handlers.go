@@ -33,8 +33,12 @@ func constructApplication() {
 	repositories := repository.NewRepositoryGroup()
 	projectRepository := backend.NewProjectRepository(repositories)
 	repositories["projects"] = projectRepository
+
 	sessionRepository := backend.NewSessionRepository(repositories)
 	repositories["sessions"] = sessionRepository
+
+	sampleRepository := backend.NewSampleRepository(repositories)
+	repositories["samples"] = sampleRepository
 
 	restful.Dispatch = func(w http.ResponseWriter, r *http.Request) {
 		lwr := &loggedResponseWriter{w, 0}
@@ -47,6 +51,7 @@ func constructApplication() {
 	apiRoot := fmt.Sprintf("/v%d", API_VERSION)
 	restful.Add(endpoints.NewProjectService(apiRoot, projectRepository))
 	restful.Add(endpoints.NewSessionService(apiRoot, sessionRepository))
+	restful.Add(endpoints.NewVoiceSampleService(apiRoot, sampleRepository))
 
 	http.Handle("/stats/", sg.Handler("/stats"))
 	http.Handle("/favicon.ico", http.NotFoundHandler())
