@@ -2,12 +2,14 @@ package endpoints
 
 import (
 	"fmt"
+	"github.com/kr/s3/s3util"
 	. "github.com/ku-ovdp/api/entities"
 	. "github.com/ku-ovdp/api/repository"
 	"github.com/ku-ovdp/api/stats"
 	"github.com/traviscline/go-restful"
 	"io"
 	"net/http"
+	"os"
 	"strconv"
 	"time"
 )
@@ -61,6 +63,7 @@ func NewVoiceSampleService(apiRoot string, repository VoiceSampleRepository) *sa
 
 	ws.Route(ws.PUT("/{sample-index}/audio").To(s.uploadVoiceSample).
 		Doc("Attach audio to a voice sample").
+		Consumes("*/*").
 		Param(ws.PathParameter("session-id", "identifier of the session").DataType("int")).
 		Param(ws.PathParameter("sample-index", "identifier of the sample").DataType("int")).
 		Param(ws.BodyParameter("Audio", "the audio blob entity").DataType("string")))
@@ -149,18 +152,70 @@ func (s *sampleService) streamVoiceSample(request *restful.Request, response *re
 		response.WriteError(http.StatusNotFound, nil)
 		return
 	}
+	ak, sk := os.Getenv("S3_ACCESS_KEY"), os.Getenv("S3_SECRET_KEY")
+	if ak == "" || sk == "" {
+		response.WriteError(http.StatusInternalServerError, fmt.Errorf("Missing S3_ACCESS_KEY and/or S3_SECRET_KEY"))
+		return
+	}
+	s3util.DefaultConfig.AccessKey = ak
+	s3util.DefaultConfig.SecretKey = sk
 
-	audio, err := http.Get(sample.AudioURL)
+	audio, err := s3util.Open(sample.AudioURL, nil)
 	if err != nil {
 		response.WriteError(http.StatusInternalServerError, err)
 		return
 	}
-	defer audio.Body.Close()
-	response.AddHeader("Content-Type", audio.Header.Get("Content-Type"))
-	response.AddHeader("Content-Length", fmt.Sprint(audio.ContentLength))
-	io.Copy(response, audio.Body)
+	defer audio.Close()
+	response.AddHeader("Content-Type", sample.MimeType)
+	io.Copy(response, audio)
 }
 
 func (s *sampleService) uploadVoiceSample(request *restful.Request, response *restful.Response) {
-	// upload to s3
+	sessionId, _ := strconv.Atoi(request.PathParameter("session-id"))
+	sampleId, _ := strconv.Atoi(request.PathParameter("sample-index"))
+
+	sample, err := s.repository.Get(sessionId, sampleId)
+	if err != nil {
+		response.WriteError(http.StatusInternalServerError, err)
+		return
+	}
+	session, err := s.repository.Group().Sessions().Get(sessionId)
+	if err != nil {
+		response.WriteError(http.StatusInternalServerError, err)
+		return
+	}
+
+	ak, sk := os.Getenv("S3_ACCESS_KEY"), os.Getenv("S3_SECRET_KEY")
+	bucket := os.Getenv("S3_BUCKET")
+
+	if ak == "" || sk == "" {
+		response.WriteError(http.StatusInternalServerError, fmt.Errorf("Missing S3_ACCESS_KEY and/or S3_SECRET_KEY"))
+		return
+	} else if bucket == "" {
+		response.WriteError(http.StatusInternalServerError, fmt.Errorf("No S3_BUCKET env var present."))
+		return
+	} else if bucket[len(bucket)-1] != '/' {
+		response.WriteError(http.StatusInternalServerError, fmt.Errorf("S3_BUCKET must have trailing slash."))
+		return
+	}
+	s3util.DefaultConfig.AccessKey = ak
+	s3util.DefaultConfig.SecretKey = sk
+
+	destURI := fmt.Sprintf("%s%d/%d/%d", bucket, session.ProjectId, sessionId, sampleId)
+	w, err := s3util.Create(destURI, nil, nil)
+	if err != nil {
+		response.WriteError(http.StatusInternalServerError, err)
+		return
+	}
+
+	io.Copy(w, request.Request.Body)
+	w.Close()
+
+	sample.AudioURL = destURI
+
+	if sample, err = s.repository.Put(sample); err == nil {
+		response.WriteEntity(sample)
+	} else {
+		response.WriteError(http.StatusBadRequest, err)
+	}
 }
