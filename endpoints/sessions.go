@@ -1,6 +1,7 @@
 package endpoints
 
 import (
+	"fmt"
 	. "github.com/ku-ovdp/api/entities"
 	. "github.com/ku-ovdp/api/repository"
 	"github.com/ku-ovdp/api/stats"
@@ -55,9 +56,14 @@ func NewSessionService(apiRoot string, repository SessionRepository) *sessionSer
 	s.WebService = ws
 	s.repository = repository
 
-	// set initial stats
-	sessions, _ := repository.Scan(1, 0, 0)
-	stats.ChangeStat("sessions", len(sessions))
+	projects, _ := repository.Group().Projects().Scan(0, 0)
+	totalSessions := 0
+	for _, project := range projects {
+		sessions, _ := repository.Scan(project.Id, 0, 0)
+		totalSessions += len(sessions)
+		stats.ChangeStat(fmt.Sprintf("sessions:%d", project.Id), len(sessions))
+	}
+	stats.ChangeStat("sessions", totalSessions)
 
 	return s
 }
@@ -123,6 +129,7 @@ func (s *sessionService) createSession(request *restful.Request, response *restf
 	}
 
 	stats.ChangeStat("sessions", 1)
+	stats.ChangeStat(fmt.Sprintf("sessions:%d", projectId), 1)
 	response.WriteHeader(http.StatusCreated)
 	response.WriteEntity(session)
 }
@@ -134,5 +141,10 @@ func (s *sessionService) removeSession(request *restful.Request, response *restf
 		return
 	}
 
-	s.repository.Remove(id)
+	err = s.repository.Remove(id)
+	if err == nil {
+		response.WriteEntity("removed")
+	} else {
+		response.WriteError(http.StatusBadRequest, err)
+	}
 }
