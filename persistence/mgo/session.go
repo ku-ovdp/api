@@ -16,6 +16,7 @@ func (m *mgoBackend) NewSessionRepository(repositories RepositoryGroup) SessionR
 		m,
 		m.db.C("sessions"),
 		repositories["projects"].(ProjectRepository),
+		repositories,
 	}
 
 	return sr
@@ -25,6 +26,7 @@ type sessionRepository struct {
 	backend  *mgoBackend
 	c        *mgo.Collection
 	projects ProjectRepository
+	group    RepositoryGroup
 }
 
 func (sr *sessionRepository) Get(id int) (Session, error) {
@@ -68,4 +70,8 @@ func (sr *sessionRepository) Scan(projectId int, from, to int) ([]Session, error
 	err := q.All(&results)
 
 	return results, err
+}
+
+func (sr *sessionRepository) Group() RepositoryGroup {
+	return sr.group
 }

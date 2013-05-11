@@ -9,7 +9,11 @@ import (
 )
 
 func (d dummyBackend) NewSessionRepository(repositories RepositoryGroup) SessionRepository {
-	return sessionRepository{dummySessionData, repositories["projects"].(ProjectRepository)}
+	return sessionRepository{
+		dummySessionData,
+		repositories["projects"].(ProjectRepository),
+		repositories,
+	}
 }
 
 type sessionRepo map[int]Session
@@ -17,6 +21,7 @@ type sessionRepo map[int]Session
 type sessionRepository struct {
 	sessionRepo
 	projects ProjectRepository
+	group    RepositoryGroup
 }
 
 var dummySessionData = map[int]Session{
@@ -70,4 +75,8 @@ func (sr sessionRepository) Scan(projectId int, from, to int) ([]Session, error)
 		results = append(results, value)
 	}
 	return results, nil
+}
+
+func (sr sessionRepository) Group() RepositoryGroup {
+	return sr.group
 }
