@@ -1,13 +1,13 @@
 package endpoints
 
 import (
+	"fmt"
 	. "github.com/ku-ovdp/api/entities"
 	. "github.com/ku-ovdp/api/repository"
 	"github.com/ku-ovdp/api/stats"
 	"github.com/traviscline/go-restful"
-	"net/http"
-	"fmt"
 	"io"
+	"net/http"
 	"strconv"
 	"time"
 )
@@ -33,11 +33,13 @@ func NewVoiceSampleService(apiRoot string, repository VoiceSampleRepository) *sa
 
 	ws.Route(ws.POST("").To(s.createVoiceSample).
 		Doc("Create a voice sample").
+		Param(ws.PathParameter("session-id", "identifier of the session").DataType("int")).
 		Reads(VoiceSample{}))
 
 	ws.Route(ws.GET("/{sample-index}").To(s.findVoiceSample).
 		Doc("Get a voice sample").
 		Param(ws.PathParameter("session-id", "identifier of the session").DataType("int")).
+		Param(ws.PathParameter("sample-index", "identifier of the sample").DataType("int")).
 		Writes(VoiceSample{}))
 
 	ws.Route(ws.PUT("/{sample-index}").To(s.updateVoiceSample).
@@ -48,7 +50,8 @@ func NewVoiceSampleService(apiRoot string, repository VoiceSampleRepository) *sa
 
 	ws.Route(ws.DELETE("/{sample-index}").To(s.removeVoiceSample).
 		Doc("Delete a voice sample").
-		Param(ws.PathParameter("session-id", "identifier of the session").DataType("int")))
+		Param(ws.PathParameter("session-id", "identifier of the session").DataType("int")).
+		Param(ws.PathParameter("sample-index", "identifier of the sample").DataType("int")))
 
 	ws.Route(ws.GET("/{sample-index}/audio").To(s.streamVoiceSample).
 		Doc("Get a voice sample's audio").
@@ -58,6 +61,8 @@ func NewVoiceSampleService(apiRoot string, repository VoiceSampleRepository) *sa
 
 	ws.Route(ws.PUT("/{sample-index}/audio").To(s.uploadVoiceSample).
 		Doc("Attach audio to a voice sample").
+		Param(ws.PathParameter("session-id", "identifier of the session").DataType("int")).
+		Param(ws.PathParameter("sample-index", "identifier of the sample").DataType("int")).
 		Param(ws.BodyParameter("Audio", "the audio blob entity").DataType("string")))
 
 	s.WebService = ws
@@ -137,19 +142,19 @@ func (s *sampleService) removeVoiceSample(request *restful.Request, response *re
 func (s *sampleService) streamVoiceSample(request *restful.Request, response *restful.Response) {
 	sessionId, _ := strconv.Atoi(request.PathParameter("session-id"))
 	sampleId, _ := strconv.Atoi(request.PathParameter("sample-index"))
-	
+
 	sample, _ := s.repository.Get(sessionId, sampleId)
 
-	if sample.Id == 0{
+	if sample.Id == 0 {
 		response.WriteError(http.StatusNotFound, nil)
 		return
 	}
 
 	audio, err := http.Get(sample.AudioURL)
-    if err != nil {
+	if err != nil {
 		response.WriteError(http.StatusInternalServerError, err)
 		return
-    }
+	}
 	defer audio.Body.Close()
 	response.AddHeader("Content-Type", audio.Header.Get("Content-Type"))
 	response.AddHeader("Content-Length", fmt.Sprint(audio.ContentLength))
@@ -158,5 +163,4 @@ func (s *sampleService) streamVoiceSample(request *restful.Request, response *re
 
 func (s *sampleService) uploadVoiceSample(request *restful.Request, response *restful.Response) {
 	// upload to s3
-	
 }
