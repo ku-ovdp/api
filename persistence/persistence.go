@@ -8,6 +8,7 @@ import (
 type Backend interface {
 	NewProjectRepository(RepositoryGroup) ProjectRepository
 	NewSessionRepository(RepositoryGroup) SessionRepository
+	NewSampleRepository(RepositoryGroup) VoiceSampleRepository
 	Init(args ...interface{})
 }
 
