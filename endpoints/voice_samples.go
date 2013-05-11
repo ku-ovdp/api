@@ -24,7 +24,7 @@ func NewVoiceSampleService(apiRoot string, repository VoiceSampleRepository) *sa
 
 	ws.Route(ws.GET("").To(s.listVoiceSamples).
 		Doc("List voice samples").
-		Param(ws.PathParameter("session-id", "identifier of the session").DataType("int")).
+		//Param(ws.PathParameter("session-id", "identifier of the session").DataType("int")).
 		Param(ws.QueryParameter("from", "minimum identifier of a project")).
 		Param(ws.QueryParameter("to", "maximum identifier of a project")).
 		Writes([]VoiceSample{}))
@@ -67,14 +67,9 @@ func NewVoiceSampleService(apiRoot string, repository VoiceSampleRepository) *sa
 	return s
 }
 
-func (s *sampleService) parseIds(request *restful.Request) (sessionId, sampleId int) {
-	sessionId, _ = strconv.Atoi(request.PathParameter("session-id"))
-	sampleId, _ = strconv.Atoi(request.PathParameter("sample-index"))
-	return
-}
-
 func (s *sampleService) listVoiceSamples(request *restful.Request, response *restful.Response) {
-	sessionId, _ := s.parseIds(request)
+	sessionId, _ := strconv.Atoi(request.PathParameter("session-id"))
+
 	from, _ := strconv.Atoi(request.QueryParameter("from"))
 	to, _ := strconv.Atoi(request.QueryParameter("to"))
 
@@ -86,7 +81,8 @@ func (s *sampleService) listVoiceSamples(request *restful.Request, response *res
 }
 
 func (s *sampleService) findVoiceSample(request *restful.Request, response *restful.Response) {
-	sessionId, sampleId := s.parseIds(request)
+	sessionId, _ := strconv.Atoi(request.PathParameter("session-id"))
+	sampleId, _ := strconv.Atoi(request.PathParameter("sample-index"))
 
 	sample, _ := s.repository.Get(sessionId, sampleId)
 
@@ -98,7 +94,7 @@ func (s *sampleService) findVoiceSample(request *restful.Request, response *rest
 }
 
 func (s *sampleService) createVoiceSample(request *restful.Request, response *restful.Response) {
-	sessionId, _ := s.parseIds(request)
+	sessionId, _ := strconv.Atoi(request.PathParameter("session-id"))
 
 	sample := VoiceSample{
 		SessionId: sessionId,
@@ -128,7 +124,8 @@ func (s *sampleService) updateVoiceSample(request *restful.Request, response *re
 }
 
 func (s *sampleService) removeVoiceSample(request *restful.Request, response *restful.Response) {
-	sessionId, sampleId := s.parseIds(request)
+	sessionId, _ := strconv.Atoi(request.PathParameter("session-id"))
+	sampleId, _ := strconv.Atoi(request.PathParameter("sample-index"))
 
 	err := s.repository.Remove(sessionId, sampleId)
 	if err == nil {
@@ -143,5 +140,5 @@ func (s *sampleService) streamVoiceSample(request *restful.Request, response *re
 }
 
 func (s *sampleService) uploadVoiceSample(request *restful.Request, response *restful.Response) {
-	// stream from s3
+	// upload to s3
 }
