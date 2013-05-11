@@ -27,13 +27,6 @@ var dummySessionData = map[int]Session{
 			{FieldSlug: "gender", Value: "Male"},
 			{FieldSlug: "parkinsons", Value: true},
 		},
-		Samples: []VoiceSample{
-			{Created: time.Now().Add(time.Hour * -14),
-				Length:   time.Second * 10,
-				Bitrate:  24000,
-				AudioURL: "http://s3.amazon.com/dopebeats.pcm",
-			},
-		},
 	},
 }
 
