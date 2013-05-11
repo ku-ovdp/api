@@ -43,14 +43,15 @@ func NewSessionService(apiRoot string, repository SessionRepository) *sessionSer
 		Reads(Session{}))
 
 	ws.Route(ws.PUT("/{session-id}").To(s.updateSession).
+		Doc("Update a session").
 		Param(ws.PathParameter("project-id", "identifier of the project").DataType("int")).
 		Param(ws.PathParameter("session-id", "identifier of the session").DataType("int")).
-		Doc("Update a session").
+		Param(ws.BodyParameter("Session", "the session entity").DataType("string")))
 
 	ws.Route(ws.DELETE("/{session-id}").To(s.removeSession).
-		Param(ws.PathParameter("project-id", "identifier of the project").DataType("int")).
-		Param(ws.PathParameter("session-id", "identifier of the session").DataType("int")).
 		Doc("Delete a session").
+		Param(ws.PathParameter("project-id", "identifier of the project").DataType("int")).
+		Param(ws.PathParameter("session-id", "identifier of the session").DataType("int")))
 
 	s.WebService = ws
 	s.repository = repository
