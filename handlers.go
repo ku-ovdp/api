@@ -53,7 +53,8 @@ func constructApplication() {
 	restful.Add(endpoints.NewSessionService(apiRoot, sessionRepository))
 	restful.Add(endpoints.NewVoiceSampleService(apiRoot, sampleRepository))
 
-	http.Handle("/stats/", sg.Handler("/stats"))
+	http.HandleFunc("/v1/stats/", stats.Handler)
+	http.Handle("/v1/livestats/", sg.Handler("/v1/livestats"))
 	http.Handle("/favicon.ico", http.NotFoundHandler())
 	http.HandleFunc("/", indexHandler(apiRoot))
 }

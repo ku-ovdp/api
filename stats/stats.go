@@ -2,6 +2,8 @@ package stats
 
 import (
 	"sync"
+	"net/http"
+	"encoding/json"
 )
 
 type ToNotify interface {
@@ -31,4 +33,10 @@ func ChangeStat(statName string, change int) {
 func init() {
 	trigger = make(chan struct{})
 	stats.data = make(map[string]int)
+}
+
+func Handler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Add("Content-Type", "application/json")
+	e := json.NewEncoder(w)
+	e.Encode(stats.data)
 }
