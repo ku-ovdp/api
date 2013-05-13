@@ -31,7 +31,7 @@ func NewVoiceSampleService(apiRoot string, repository VoiceSampleRepository) *sa
 		Param(ws.PathParameter("session-id", "identifier of the session").DataType("int")).
 		Param(ws.QueryParameter("from", "minimum identifier of a project")).
 		Param(ws.QueryParameter("to", "maximum identifier of a project")).
-		Writes([]VoiceSample{}))
+		Writes(VoiceSample{}))
 
 	ws.Route(ws.POST("").To(s.createVoiceSample).
 		Doc("Create a voice sample").

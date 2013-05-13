@@ -29,7 +29,7 @@ func NewSessionService(apiRoot string, repository SessionRepository) *sessionSer
 		Param(ws.PathParameter("project-id", "identifier of the project").DataType("int")).
 		Param(ws.QueryParameter("from", "minimum identifier of a project")).
 		Param(ws.QueryParameter("to", "maximum identifier of a project")).
-		Writes([]Session{}))
+		Writes(Session{}))
 
 	ws.Route(ws.GET("/{session-id}").To(s.findSession).
 		Doc("Get a session").

@@ -27,7 +27,7 @@ func NewProjectService(apiRoot string, repository ProjectRepository) *projectSer
 		Doc("List projects").
 		Param(ws.QueryParameter("from", "minimum identifier of a project")).
 		Param(ws.QueryParameter("to", "maximum identifier of a project")).
-		Writes([]Project{}))
+		Writes(Project{}))
 
 	ws.Route(ws.GET("/{project-id}").To(ps.findProject).
 		Doc("Get a project").
