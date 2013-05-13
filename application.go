@@ -57,19 +57,17 @@ func constructApplication() {
 	// other handlers
 	http.HandleFunc("/v1/stats/", stats.Handler)
 	http.Handle("/favicon.ico", http.NotFoundHandler())
-	http.HandleFunc("/", indexHandler(apiRoot))
+	http.HandleFunc("/", indexHandler)
 }
 
-func indexHandler(apiRoot string) func(http.ResponseWriter, *http.Request) {
-	return func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-		b, _ := json.MarshalIndent(struct {
-			Url string `json:"documentation_url"`
-		}{
-			apiRoot + "/v1-docs",
-		}, "", "  ")
-		fmt.Fprintln(w, string(b))
-	}
+func indexHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	b, _ := json.Marshal(struct {
+		Url string `json:"documentation_url"`
+	}{
+		fmt.Sprintf("/v%d-docs", API_VERSION),
+	})
+	fmt.Fprintln(w, string(b))
 }
 
 func loggingDispatch(w http.ResponseWriter, r *http.Request) {
