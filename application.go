@@ -11,6 +11,7 @@ import (
 	"github.com/ku-ovdp/api/sockgroup"
 	"github.com/ku-ovdp/api/stats"
 	"github.com/traviscline/go-restful"
+	"log"
 	"net/http"
 	"time"
 )
@@ -26,7 +27,7 @@ func constructApplication() {
 
 	backend := persistence.Get(*persistenceBackend)
 	if backend == nil {
-		logger.Fatalln("Invalid repository backend.", *persistenceBackend)
+		log.Fatalln("Invalid repository backend.", *persistenceBackend)
 	}
 	backend.Init()
 
