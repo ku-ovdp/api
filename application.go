@@ -19,18 +19,14 @@ import (
 // Create application services and dependancies
 func constructApplication() {
 
-	sg := sockgroup.NewGroup()
-	sg.Start()
-	stats.Destination = sg
-
-	// construct repositories
-
+	// construct backend
 	backend := persistence.Get(*persistenceBackend)
 	if backend == nil {
 		log.Fatalln("Invalid repository backend.", *persistenceBackend)
 	}
 	backend.Init()
 
+	// build repositories
 	repositories := repository.NewRepositoryGroup()
 	projectRepository := backend.NewProjectRepository(repositories)
 	repositories["projects"] = projectRepository
@@ -41,21 +37,25 @@ func constructApplication() {
 	sampleRepository := backend.NewSampleRepository(repositories)
 	repositories["samples"] = sampleRepository
 
-	restful.Dispatch = func(w http.ResponseWriter, r *http.Request) {
-		lwr := &loggedResponseWriter{w, 0}
-		t1 := time.Now()
-		restful.DefaultDispatch(lwr, r)
-		fmt.Println(r.Method, r.URL, lwr.status, time.Now().Sub(t1))
-	}
+	// register logging Dispatch method
+	restful.Dispatch = loggingDispatch
+	// set default mime type
 	restful.DefaultResponseMimeType = restful.MIME_JSON
 
+	// construct and register services
 	apiRoot := fmt.Sprintf("/v%d", API_VERSION)
 	restful.Add(endpoints.NewProjectService(apiRoot, projectRepository))
 	restful.Add(endpoints.NewSessionService(apiRoot, sessionRepository))
 	restful.Add(endpoints.NewVoiceSampleService(apiRoot, sampleRepository))
 
-	http.HandleFunc("/v1/stats/", stats.Handler)
+	// sockgroup for publishing statistics
+	sg := sockgroup.NewGroup()
+	sg.Start()
+	stats.Destination = sg
 	http.Handle("/v1/livestats/", sg.Handler("/v1/livestats"))
+
+	// other handlers
+	http.HandleFunc("/v1/stats/", stats.Handler)
 	http.Handle("/favicon.ico", http.NotFoundHandler())
 	http.HandleFunc("/", indexHandler(apiRoot))
 }
@@ -63,13 +63,20 @@ func constructApplication() {
 func indexHandler(apiRoot string) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
-		b, _ := json.MarshalIndent([]struct {
-			Url string `json:"endpoint_url"`
+		b, _ := json.MarshalIndent(struct {
+			Url string `json:"documentation_url"`
 		}{
-			{apiRoot + "/projects"},
+			apiRoot + "/v1-docs",
 		}, "", "  ")
 		fmt.Fprintln(w, string(b))
 	}
+}
+
+func loggingDispatch(w http.ResponseWriter, r *http.Request) {
+	lwr := &loggedResponseWriter{w, 0}
+	t1 := time.Now()
+	restful.DefaultDispatch(lwr, r)
+	fmt.Println(r.Method, r.URL, lwr.status, time.Now().Sub(t1))
 }
 
 type loggedResponseWriter struct {
