@@ -9,7 +9,7 @@ Assuming you have a functional go environment you can simply:
 
 $ go get github.com/ku-ovdp/api
 
-To add swagger:
+To add swagger (api documentation viewer):
 
 * $ cd $GOPATH/src/github.com/ku-ovdp
 * $ git submodule update --init --recursive
